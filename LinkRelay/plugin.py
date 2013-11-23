@@ -396,7 +396,6 @@ class LinkRelay(callbacks.Plugin):
         for relay in self.relays:
             if ircutils.toLower(relay.sourceChannel) == ircutils.toLower(channel) and \
                     ircutils.toLower(relay.sourceNetwork) == ircutils.toLower(irc.network):
-                # Little security function here to prevent spies :P
                 if msg.nick not in irc.state.channels[channel].users:
                     self.log.warning('LinkRelay: %s on %s attempted to view'
                         ' nicks in %s without being in it.'
@@ -419,7 +418,6 @@ class LinkRelay(callbacks.Plugin):
                     channels = relay.targetIRC.state.channels
                     found = False
                     for key, channel_ in channels.items():
-                        self.log.info('LinkRelay: %s' % relay.targetIRC.state.channels.items())
                         if ircutils.toLower(relay.targetChannel) == ircutils.toLower(key):
                         # if re.match('\b%s\b' % re.escape(relay.targetChannel), re.escape(key), flags=re.IGNORECASE):
                             found = True
