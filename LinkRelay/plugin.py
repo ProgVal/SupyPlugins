@@ -394,8 +394,8 @@ class LinkRelay(callbacks.Plugin):
         if irc.nested:
             irc.error('This command cannot be nested.', Raise=True)
         for relay in self.relays:
-            if relay.sourceChannel == channel and \
-                    relay.sourceNetwork == irc.network:
+            if ircutils.toLower(relay.sourceChannel) == ircutils.toLower(channel) and \
+                    ircutils.toLower(relay.sourceNetwork) == ircutils.toLower(irc.network):
                 # Little security function here to prevent spies :P
                 if msg.nick not in irc.state.channels[channel].users:
                     self.log.warning('LinkRelay: %s on %s attempted to view'
@@ -419,7 +419,9 @@ class LinkRelay(callbacks.Plugin):
                     channels = relay.targetIRC.state.channels
                     found = False
                     for key, channel_ in channels.items():
-                        if re.match(relay.targetChannel, key):
+                        self.log.info('LinkRelay: %s' % relay.targetIRC.state.channels.items())
+                        if ircutils.toLower(relay.targetChannel) == ircutils.toLower(key):
+                        # if re.match('\b%s\b' % re.escape(relay.targetChannel), re.escape(key), flags=re.IGNORECASE):
                             found = True
                             break
                     if not found:
