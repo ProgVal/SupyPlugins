@@ -56,32 +56,26 @@ class ColorNumber(registry.String):
         self.setValue(s)
 ColorNumber = internationalizeDocstring(ColorNumber)
 
-
 LinkRelay = conf.registerPlugin('LinkRelay')
 conf.registerChannelValue(LinkRelay, 'color',
-    registry.Boolean(False, _("""Determines whether the bot will color Relayed
+    registry.Boolean(False, _("""Determines whether the bot will color relayed
     PRIVMSGs so as to make the messages easier to read.""")))
-# This is a leftover entry and isn't implemented yet; taking this out so it 
-# doesn't confuse any users -GLolol
-# conf.registerChannelValue(LinkRelay, 'topicSync',
-    # registry.Boolean(True, _("""Determines whether the bot will synchronize
-    # topics between networks in the channels it Relays.""")))
 conf.registerChannelValue(LinkRelay, 'hostmasks',
     registry.Boolean(False, _("""Determines whether the bot will Relay the
     hostmask of the person joining or parting the channel when he or she joins
     or parts.""")))
 conf.registerChannelValue(LinkRelay, 'nicks',
     registry.Boolean(True, _("""Determines whether the bot will relay the
-    nick of the person sending a message (you probably want this turned on).""")))
+    nick of the person sending a message (you probably want this on).""")))
 conf.registerChannelValue(LinkRelay, 'includeNetwork',
     registry.Boolean(True, _("""Determines whether the bot will include the
     network in Relayed PRIVMSGs; if you're only Relaying between two networks,
     it's somewhat redundant, and you may wish to save the space.""")))
 
 conf.registerGroup(LinkRelay, 'nickstoIgnore')
-conf.registerChannelValue(LinkRelay.nickstoIgnore, 'nicks',
-    registry.SpaceSeparatedListOfStrings('', _("""Determines a list of nicks for the bot to
-    ignore (takes a space-seperated list).""")))
+conf.registerGlobalValue(LinkRelay.nickstoIgnore, 'nicks',
+    registry.SpaceSeparatedListOfStrings('', _("""Determines a list of nicks
+    for the bot to ignore (takes a space-seperated list).""")))
 conf.registerChannelValue(LinkRelay.nickstoIgnore, 'affectPrivmsgs',
     registry.Boolean(True, _("""Determines whether the bot will ignore PRIVMSGs
     from the nicks listed in nicksToIgnore. If set to False, the bot will only
@@ -112,16 +106,20 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
     yourself unless you know what you do. Use @LinkRelay (no)substitute instead.""")))
 
 conf.registerGroup(LinkRelay, 'colors')
-for name, color in {'info': '02',
-                    'truncated': '14',
-                    'mode': '06',
+for name, color in {'mode': '06',
                     'join': '03',
                     'part': '12',
                     'kick': '04',
                     'nick': '10',
                     'quit': '07'}.items():
     conf.registerChannelValue(LinkRelay.colors, name,
-        ColorNumber(color, _("""Color used for relaying %s messages.""") % name))
+        ColorNumber(color, _("""Color used for relaying %ss.""") % name ))
+conf.registerChannelValue(LinkRelay.colors, 'info',
+    ColorNumber('02', _("""Color used for relaying informational messages.""")))
+conf.registerChannelValue(LinkRelay.colors, 'truncated',
+    ColorNumber('14', _("""Color used for relaying truncated messages.""")))
+
+                    
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

@@ -77,6 +77,8 @@ class LinkRelay(callbacks.Plugin):
         self.__parent.__init__(irc)
         self._loadFromConfig()
         self.ircstates = {}
+        self.ignoreNicks = [ircutils.toLower(item) for item in \
+            self.registryValue('nickstoIgnore.nicks')]
         for IRC in world.ircs:
             self.addIRC(IRC)
         try:
@@ -188,10 +190,8 @@ class LinkRelay(callbacks.Plugin):
         s = msg.args[1]
         s, args = self.getPrivmsgData(channel, msg.nick, s,
                                self.registryValue('color', channel))
-        ignoreNicks = [ircutils.toLower(item) for item in \
-            self.registryValue('nickstoIgnore.nicks', msg.args[0])]
         if self.registryValue('nickstoIgnore.affectPrivmsgs', msg.args[0]) \
-            == 1 and ircutils.toLower(msg.nick) in ignoreNicks:
+            == 1 and ircutils.toLower(msg.nick) in self.ignoreNicks:
                 #self.log.debug('LinkRelay: %s in nickstoIgnore...' % ircutils.toLower(msg.nick))
                 #self.log.debug('LinkRelay: List of ignored nicks: %s' % ignoreNicks)
                 return
@@ -225,9 +225,7 @@ class LinkRelay(callbacks.Plugin):
         self.addIRC(irc)
 
     def doMode(self, irc, msg):
-        ignoreNicks = [ircutils.toLower(item) for item in \
-            self.registryValue('nickstoIgnore.nicks', msg.args[0])]
-        if ircutils.toLower(msg.nick) not in ignoreNicks:
+        if ircutils.toLower(msg.nick) not in self.ignoreNicks:
             self.addIRC(irc)
             args = {'nick': msg.nick, 'channel': msg.args[0],
                     'mode': ' '.join(msg.args[1:]), 'color': ''}
@@ -238,9 +236,7 @@ class LinkRelay(callbacks.Plugin):
             self.sendToOthers(irc, msg.args[0], s, args)
 
     def doJoin(self, irc, msg):
-        ignoreNicks = [ircutils.toLower(item) for item in \
-            self.registryValue('nickstoIgnore.nicks', msg.args[0])]
-        if ircutils.toLower(msg.nick) not in ignoreNicks:
+        if ircutils.toLower(msg.nick) not in self.ignoreNicks:
             self.addIRC(irc)
             args = {'nick': msg.nick, 'channel': msg.args[0], 'color': '',
                     'userhost': ''}
@@ -254,9 +250,7 @@ class LinkRelay(callbacks.Plugin):
             self.sendToOthers(irc, msg.args[0], s, args)
 
     def doPart(self, irc, msg):
-        ignoreNicks = [ircutils.toLower(item) for item in \
-            self.registryValue('nickstoIgnore.nicks', msg.args[0])]
-        if ircutils.toLower(msg.nick) not in ignoreNicks:
+        if ircutils.toLower(msg.nick) not in self.ignoreNicks:
             self.addIRC(irc)
             args = {'nick': msg.nick, 'channel': msg.args[0], 'color': '', 'message': '',
                     'userhost': ''}
@@ -286,9 +280,7 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doNick(self, irc, msg):
-        ignoreNicks = [ircutils.toLower(item) for item in \
-            self.registryValue('nickstoIgnore.nicks', msg.args[0])]
-        if ircutils.toLower(msg.nick) not in ignoreNicks:
+        if ircutils.toLower(msg.nick) not in self.ignoreNicks:
             self.addIRC(irc)
             args = {'oldnick': msg.nick, 'network': irc.network,
                     'newnick': msg.args[0], 'color': ''}
@@ -301,9 +293,7 @@ class LinkRelay(callbacks.Plugin):
                     self.sendToOthers(irc, channel, s, args)
 
     def doQuit(self, irc, msg):
-        ignoreNicks = [ircutils.toLower(item) for item in \
-            self.registryValue('nickstoIgnore.nicks', msg.args[0])]
-        if ircutils.toLower(msg.nick) not in ignoreNicks:
+        if ircutils.toLower(msg.nick) not in self.ignoreNicks:
             args = {'nick': msg.nick, 'network': irc.network,
                     'message': msg.args[0], 'color': '', 'userhost': ''}
             if self.registryValue('color', msg.args[0]):
@@ -417,11 +407,11 @@ class LinkRelay(callbacks.Plugin):
 
                     channels = relay.targetIRC.state.channels
                     found = False
-                    for key, channel_ in channels.items():
-                        if ircutils.toLower(relay.targetChannel) == ircutils.toLower(key):
-                        # if re.match('\b%s\b' % re.escape(relay.targetChannel), re.escape(key), flags=re.IGNORECASE):
-                            found = True
-                            break
+                    # for key, channel_ in channels.items():
+                    if ircutils.toLower(relay.targetChannel) in ircutils.toLower(channels.items):
+                    # if re.match('\b%s\b' % re.escape(relay.targetChannel), re.escape(key), flags=re.IGNORECASE):
+                        found = True
+                        break
                     if not found:
                         continue
 
