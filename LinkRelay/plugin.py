@@ -407,11 +407,11 @@ class LinkRelay(callbacks.Plugin):
 
                     channels = relay.targetIRC.state.channels
                     found = False
-                    # for key, channel_ in channels.items():
-                    if ircutils.toLower(relay.targetChannel) in ircutils.toLower(channels.items):
-                    # if re.match('\b%s\b' % re.escape(relay.targetChannel), re.escape(key), flags=re.IGNORECASE):
-                        found = True
-                        break
+                    for key, channel_ in channels.items():
+                        if ircutils.toLower(relay.targetChannel) == ircutils.toLower(key):
+                        # if re.match('\b%s\b' % re.escape(relay.targetChannel), re.escape(key), flags=re.IGNORECASE):
+                            found = True
+                            break
                     if not found:
                         continue
 
